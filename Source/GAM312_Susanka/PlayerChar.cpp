@@ -65,6 +65,7 @@ void APlayerChar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("JumpEvent", IE_Pressed, this, &APlayerChar::StartJump);
 	PlayerInputComponent->BindAction("JumpEvent", IE_Released, this, &APlayerChar::StopJump);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerChar::FindObject);
+	PlayerInputComponent->BindAction("PlayerHurt", IE_Pressed, this, &APlayerChar::PlayerHurt);
 }
 
 void APlayerChar::MovePlayerForward(float axisValue)
@@ -143,6 +144,11 @@ void APlayerChar::FindObject()
 		}
 		
 	}
+}
+
+void APlayerChar::PlayerHurt()
+{
+	SetHunger(-25.0f);
 }
 
 void APlayerChar::SetHealth(float amount)

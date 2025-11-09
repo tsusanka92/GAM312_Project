@@ -43,6 +43,9 @@ public:
 
 	UFUNCTION()
 		void FindObject();
+		
+	UFUNCTION()
+		void PlayerHurt();
 
 	UPROPERTY(VisibleAnywhere)
 		UCameraComponent* PlayerCamComp;
