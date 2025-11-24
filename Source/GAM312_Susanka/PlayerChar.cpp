@@ -40,14 +40,16 @@ void APlayerChar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	playerUI->UpdateBars(Health, Hunger, Stamina);
+
 	//constant running debug to show the players current stats and inventory
 	if (GEngine != nullptr)
 	{
-		FString StatsText = FString::Printf(TEXT("Health: %.0f | Stamina: %.0f | Hunger: %.0f\nWood: %d | Stone: %d | Berry: %d"),
-			Health, Stamina, Hunger,
-			ResourcesArray[0], ResourcesArray[1], ResourcesArray[2]); //Set a text popup that reads out the players current stats and inventory.
+		//FString StatsText = FString::Printf(TEXT("Health: %.0f | Stamina: %.0f | Hunger: %.0f\nWood: %d | Stone: %d | Berry: %d"),
+		//	Health, Stamina, Hunger,
+		//	ResourcesArray[0], ResourcesArray[1], ResourcesArray[2]); //Set a text popup that reads out the players current stats and inventory.
 
-		GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Green, StatsText); //Adds a readout on the top left every frame
+		//GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Green, StatsText); //Adds a readout on the top left every frame
 		
 		if (isBuilding)
 		{
@@ -131,18 +133,18 @@ void APlayerChar::FindObject()
 			GiveResources(amountToGive, hitName); //update players resources with available amount
 			HitResource->totalResource -= amountToGive; //Set hit resource to whatever amount has been reduced
 
-			FString resourceLeftText = FString::Printf(TEXT("%s collected: %d | Remaining: %d"), 
-				*HitResource->resourceName, amountToGive, HitResource->totalResource); //debug text showing type of resource, amount collected, left, and current player inventory
+			//FString resourceLeftText = FString::Printf(TEXT("%s collected: %d | Remaining: %d"), 
+			//	*HitResource->resourceName, amountToGive, HitResource->totalResource); //debug text showing type of resource, amount collected, left, and current player inventory
 
-			check(GEngine != nullptr);
-			GEngine->AddOnScreenDebugMessage(100, 5.0f, FColor::Yellow, resourceLeftText); //debug of the resource consumed
+			//check(GEngine != nullptr);
+			//GEngine->AddOnScreenDebugMessage(100, 5.0f, FColor::Yellow, resourceLeftText); //debug of the resource consumed
 			
 			//Check to see if node is depleted, if yes, delete
 			if (HitResource->totalResource <= 0)
 			{
 				HitResource->Destroy();
-				check(GEngine != nullptr);
-				GEngine->AddOnScreenDebugMessage(101, 5.0f, FColor::Red, TEXT("Resource Depleted")); //debug removal of the node
+				//check(GEngine != nullptr);
+				//GEngine->AddOnScreenDebugMessage(101, 5.0f, FColor::Red, TEXT("Resource Depleted")); //debug removal of the node
 			}
 
 			UGameplayStatics::SpawnDecalAtLocation(GetWorld(), hitDecal, FVector(10.0f, 10.0f, 10.0f), HitResult.Location, FRotator(-90, 0, 0), 2.0f);
