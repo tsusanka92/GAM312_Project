@@ -33,6 +33,12 @@ void APlayerChar::BeginPlay()
 	
 	FTimerHandle StatsTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(StatsTimerHandle, this, &APlayerChar::DecreaseStats, 2.0f, true);
+
+	if (objWidget)
+	{
+		objWidget->UpdatebuildObj(0.0f);
+		objWidget->UpdatematOBJ(0.0f);
+	}
 }
 
 // Called every frame
@@ -120,50 +126,57 @@ void APlayerChar::FindObject()
 	QueryParams.bTraceComplex = true;
 	QueryParams.bReturnFaceIndex = true;
 
-	if (!isBuilding && Stamina >= 5.0f && GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams)) //Perform Line Trace. Pass in necessary/desired variables.
+	if (!isBuilding) //Perform Line Trace. Pass in necessary/desired variables.
 	{
-		AResource_M* HitResource = Cast<AResource_M>(HitResult.GetActor()); //Cast to the hit actor, if resource, set it to variable.
-
-		//If the hit was a resource, do this.
-		if (HitResource && HitResource->totalResource > 0) //Validate whether it is a resource, if yes, check to make sure there is resource left
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams))
 		{
-			FString hitName = HitResource->resourceName; //set variable = to resource name
-			int resourceValue = HitResource->resourceAmount; //set variable = to resource amount (per hit, not total)
-			int amountToGive = FMath::Min(HitResource->totalResource, resourceValue); //set a variable equal to the lesser between the remaining resources or the resource drain
-			GiveResources(amountToGive, hitName); //update players resources with available amount
-			HitResource->totalResource -= amountToGive; //Set hit resource to whatever amount has been reduced
-
-			//FString resourceLeftText = FString::Printf(TEXT("%s collected: %d | Remaining: %d"), 
-			//	*HitResource->resourceName, amountToGive, HitResource->totalResource); //debug text showing type of resource, amount collected, left, and current player inventory
-
-			//check(GEngine != nullptr);
-			//GEngine->AddOnScreenDebugMessage(100, 5.0f, FColor::Yellow, resourceLeftText); //debug of the resource consumed
-			
-			//Check to see if node is depleted, if yes, delete
-			if (HitResource->totalResource <= 0)
+			AResource_M* HitResource = Cast<AResource_M>(HitResult.GetActor()); //Cast to the hit actor, if resource, set it to variable.
+			//If the hit was a resource, do this.
+			if (HitResource && HitResource->totalResource > 0 && Stamina >= 5.0f) //Validate whether it is a resource, if yes, check to make sure there is resource left
 			{
-				HitResource->Destroy();
+				FString hitName = HitResource->resourceName; //set variable = to resource name
+				int resourceValue = HitResource->resourceAmount; //set variable = to resource amount (per hit, not total)
+				int amountToGive = FMath::Min(HitResource->totalResource, resourceValue); //set a variable equal to the lesser between the remaining resources or the resource drain
+				GiveResources(amountToGive, hitName); //update players resources with available amount
+				HitResource->totalResource -= amountToGive; //Set hit resource to whatever amount has been reduced
+
+				matsCollected = matsCollected + amountToGive;
+				objWidget->UpdatematOBJ(matsCollected);
+
+				//FString resourceLeftText = FString::Printf(TEXT("%s collected: %d | Remaining: %d"), 
+				//	*HitResource->resourceName, amountToGive, HitResource->totalResource); //debug text showing type of resource, amount collected, left, and current player inventory
+
 				//check(GEngine != nullptr);
-				//GEngine->AddOnScreenDebugMessage(101, 5.0f, FColor::Red, TEXT("Resource Depleted")); //debug removal of the node
+				//GEngine->AddOnScreenDebugMessage(100, 5.0f, FColor::Yellow, resourceLeftText); //debug of the resource consumed
+
+				//Check to see if node is depleted, if yes, delete
+				if (HitResource->totalResource <= 0)
+				{
+					HitResource->Destroy();
+					//check(GEngine != nullptr);
+					//GEngine->AddOnScreenDebugMessage(101, 5.0f, FColor::Red, TEXT("Resource Depleted")); //debug removal of the node
+				}
+
+				UGameplayStatics::SpawnDecalAtLocation(GetWorld(), hitDecal, FVector(10.0f, 10.0f, 10.0f), HitResult.Location, FRotator(-90, 0, 0), 2.0f);
+				SetStamina(-5.0f); //Drain player stamina
+
+				//Save for Debug purposes
+				/*if (hitName == "Berry")
+				{
+					SetStamina(10.0f);
+					SetHunger(1.0f);
+					GEngine->AddOnScreenDebugMessage(102, 5.0f, FColor::Blue, TEXT("You ate a berry")); //debug for player eating a berry
+				}*/
 			}
-
-			UGameplayStatics::SpawnDecalAtLocation(GetWorld(), hitDecal, FVector(10.0f, 10.0f, 10.0f), HitResult.Location, FRotator(-90, 0, 0), 2.0f);
-			SetStamina(-5.0f); //Drain player stamina
-
-			//Save for Debug purposes
-			/*if (hitName == "Berry")
-			{
-				SetStamina(10.0f);
-				SetHunger(1.0f);
-				GEngine->AddOnScreenDebugMessage(102, 5.0f, FColor::Blue, TEXT("You ate a berry")); //debug for player eating a berry
-			}*/
-		}
-		
+		}		
 	}
 
 	else
 	{
 		isBuilding = false;
+		objectsBuilt = objectsBuilt + 1.0f;
+
+		objWidget->UpdatebuildObj(objectsBuilt);
 	}
 }
 
