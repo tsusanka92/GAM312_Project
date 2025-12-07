@@ -232,7 +232,7 @@ void APlayerChar::DecreaseStats()
 
 	if (Hunger <= 0)
 	{
-		SetHealth(-3.0f);
+		SetHealth(-25.0f);
 	}
 }
 
