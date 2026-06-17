@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/ArrowComponent.h"
+#include "Materials/MaterialInterface.h"
 #include "BuildingPart.generated.h"
 
 UCLASS()
@@ -29,4 +30,34 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		UArrowComponent* PivotArrow;
+
+	UPROPERTY(EditAnywhere)
+		FName BuildingID;
+
+	UPROPERTY()
+		bool bIsGhost = false;
+
+	UPROPERTY(BlueprintReadOnly)
+		bool bPlacementValid = true;
+
+	UFUNCTION()
+		void SetPlacementValid(bool bValid);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+		UMaterialInterface* MainMaterial = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+		UMaterialInterface* ValidMaterial = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Materials")
+		UMaterialInterface* InvalidMaterial = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Snap")
+		USceneComponent* SnapRoot;
+
+	UFUNCTION(BlueprintCallable)
+		TArray<USceneComponent*> GetSnapPoints() const;
+
+	UFUNCTION()
+		void SetGhostMode(bool bGhost);
 };

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/TextRenderComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "ResourceTypes.h"
 #include "Resource_M.generated.h"
 
 UCLASS()
@@ -25,14 +26,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FString resourceName = "Wood";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Resource")
+		TArray<FHarvestResource> ResourceInfo;
 
-	UPROPERTY(EditAnywhere)
-		int resourceAmount = 5;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
+		int TotalResourceMax = 0;
 
-	UPROPERTY(EditAnywhere)
-		int totalResource = 100;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Resource")
+		int TotalResourceCurrent = 0;
 
 	UPROPERTY(EditAnywhere)
 		UTextRenderComponent* ResourceNameTxt;
@@ -45,4 +46,17 @@ public:
 
 	UPROPERTY()
 		FText tempText;
+
+	UFUNCTION()
+		void UpdateTotalMaxResource();
+
+	UFUNCTION()
+		void UpdateTotalCurrentResource();
+
+	UFUNCTION()
+		void SyncResourceReserves();
+
+#if WITH_EDITOR
+		virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 };
